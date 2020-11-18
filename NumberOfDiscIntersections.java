@@ -6,35 +6,31 @@ import java.util.Arrays;
  */
 public class NumberOfDiscIntersections {
     public int solution(int[] A) {
-
-        long intersections = 0;
-        long[] upper = new long[A.length];
-        long[] lower = new long[A.length];
-
-
-        for (int i=0;i<A.length;i++){
-            upper[i] = i + A[i];
-            lower[i] = i - A[i];
+        int[][] events = new int[A.length*2][2];
+        for (int i = 0; i < A.length; i++) {
+            events[2*i] = new int[]{i - A[i], +1};
+            events[2*i + 1] = new int[]{i + A[i], -1};
         }
+        Comparator<int[]> comparing0 = comparing(event -> event[0]);
+        Comparator<int[]> comparing1 = Comparator.comparing(event -> -1 * event[1]);
+        Arrays.sort(events, comparing0.thenComparing(comparing1));
 
-        Arrays.sort(upper);
-        Arrays.sort(lower);
+        int intersections = 0;
+        int activeCircles = 0;
+        for (int i = 0; i < events.length; i++) {
+            if (events[i][1] == 1) {
+                intersections += activeCircles;
+                activeCircles++;
+            } else {
 
-        int lower_index = 0;
-
-        for (int i=0;i<upper.length;i++)
-        {
-            while ( lower_index < A.length && upper[i]>=lower[lower_index] )
-            {
-                lower_index++;
+                activeCircles--;
             }
 
-            intersections+= lower_index - i - 1;
         }
-        if (intersections > 10000000){
+        if (intersections >= 10e6) {
             return -1;
         }
 
-        return (int)intersections;
+        return intersections;
     }
 }
